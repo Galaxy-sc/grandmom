@@ -1,41 +1,18 @@
-const playwright = require('playwright')
-const cheerio = require('cheerio')
+import puppeteer from "https://deno.land/x/puppeteer@16.2.0/mod.ts"
+import * as cheerio from "https://esm.sh/cheerio@1.0.0-rc.12"
 
-//--------------------------------------
-
-if (process.argv[2] && process.argv[2] == '--help') {
-  
-  console.log(`
-  Developer assume no liability and are not responsible for any misuse or damage.
-
-  -u        Enter the dork and url with this switch, example: -u site:*.mysite.com
-  
-  `)
-  
-  process.exit(1)
-}
-
-//--------------------------------------
-
-const urlPath = process.argv.indexOf('-u')
-let myUrl
-
-if (urlPath > -1) {
-    myUrl = process.argv[urlPath + 1]
-}
-const userUrl = myUrl
-
-//--------------------------------------
-
+const myurl = Deno.args.indexOf('--url')
+let urlsIndex = myurl + 1
+const userUrl = Deno.args[urlsIndex]
 
 const url = []
 
 async function saveImages() {
-  const browser = await playwright.chromium.launch({
+  const browser = await puppeteer.launch({
       headless: true
   })
   const page = await browser.newPage()
-  i = 0
+  let i = 0
   while(true){
     await page.goto(`https://www.google.com/search?q=${userUrl}&start=${i}`)
     const html = await page.content()

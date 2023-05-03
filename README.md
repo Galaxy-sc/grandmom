@@ -1,22 +1,24 @@
 # grandmom
 #
-Google Scraper to find subdomains.
+Deno js google Scraper to find subdomains.
 #### Install
 ```sh
-git clone https://github.com/Galaxy-sc/grandmom
-cd grandmom
-npm i
+deno run -A --unstable https://deno.land/x/puppeteer@16.2.0/install.ts
 ```
-#### Help
-```sh
-node grandpa.js --help
-```
+Linux dependencies:
+https://github.com/puppeteer/puppeteer/blob/main/docs/troubleshooting.md
 
 #### Run
 ```sh
-node grandpa.js -u site:*.your_site
+deno run -A grandmom.js --url site:*.your_site
 ```
 or
 ```sh
-node grandpa.js -u site:*.*.your_site
+deno run -A grandmom.js --url site:*.*.your_site
+```
+
+### compile
+```sh
+deno compile -A grandmom.js
+grandmom --url site:*.your_site
 ```
