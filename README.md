@@ -1,5 +1,6 @@
 این ابزار با هدف تشخیص تکرار هر کلمه در کتاب‌ها ایجاد شده تا زبان آموزان بتوانند کلمات پرتکرار کتاب مرتبط با رشته یا زمینه کاری خودشان یادبگیرند.
 
+
 [دانلود نسخه ویندوز](https://github.com/Galaxy-sc/grandmom/releases/download/v0.1.1/grandmom.exe)
 
 ```sh
@@ -19,3 +20,7 @@ deno run -A ./grandmom.js ./book.pdf > words.txt
 # compile
 deno compile -A ./grandmom.js
 ```
+
+## نمونه:
+
+![](https://github.com/Galaxy-sc/grandmom/blob/main/demo.PNG)
