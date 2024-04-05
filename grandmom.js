@@ -31,7 +31,7 @@ async function main() {
     let sortCounter = counter.sort(function(a, b) {
         return parseInt(a.split(":")[0]) - parseInt(b.split(":")[0]) // Sort by number of duplicates
     })
-    Deno.writeTextFile("./words.txt")
+
     let co = 0
     sortCounter.reverse().forEach( (x) => {
         console.log(co + '\t-\t' + x)
