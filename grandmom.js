@@ -3,8 +3,7 @@ import {readPdfText} from 'npm:pdf-text-reader'
 async function main() {
     const path = await Deno.args[0]
     const pdfText = await readPdfText({url: path})
-    let textr = pdfText.replace(/[\n\d]/g, "")
-    let textChar = textr.replace(/\W/g, " ")
+    let textChar = pdfText.replace(/[\n\d\W\_]/g, " ")
     let saveTextChar = textChar.split(" ")
     saveTextChar.forEach((x, i)=>{
         saveTextChar[i] = x.toLowerCase()
@@ -14,17 +13,17 @@ async function main() {
 
     // Duplicate counter
     let counter = []
-    var current = null;
-    var cnt = 0;
+    var current
+    var cnt = 0
     for (var i = 0; i < saveTextChar.length; i++) {
-        if (saveTextChar[i] != current && saveTextChar[i].length > 1) {
+        if (saveTextChar[i] != current) {
             if (cnt > 0) {
                 counter[i] = cnt + '\t:\t' + current
             }
             current = saveTextChar[i]
-            cnt = 1;
+            cnt = 1
         } else {
-            cnt++;
+            cnt++ // Word counter
         }
     }
 
