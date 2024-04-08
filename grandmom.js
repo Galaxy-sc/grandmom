@@ -32,10 +32,11 @@ async function main() {
     let sortCounter = counter.sort(function(a, b) {
         return parseInt(a.split(":")[0]) - parseInt(b.split(":")[0]) // Sort by number of duplicates
     })
-
+    let cW = 1
     sortCounter.reverse().forEach( x => {
         if (words.check(x.split(":")[1])){ // Word checker in the dictionary
-            console.log(`${x.split(":")[0]}\t:\t${x.split(":")[1]}`)
+            console.log(`${cW}\t-\t${x.split(":")[0]}\t:\t${x.split(":")[1]}`)
+            cW++
         }
     })
 }
