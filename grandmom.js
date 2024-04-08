@@ -1,6 +1,8 @@
 import {readPdfText} from 'npm:pdf-text-reader'
+import checkWord from 'npm:check-if-word'
 
 async function main() {
+    let words = checkWord('en')
     const path = await Deno.args[0]
     const pdfText = await readPdfText({url: path})
     let textChar = pdfText.replace(/[\n\d\W\_]/g, " ")
@@ -18,7 +20,7 @@ async function main() {
     for (var i = 0; i < saveTextChar.length; i++) {
         if (saveTextChar[i] != current) {
             if (cnt > 0) {
-                counter[i] = cnt + '\t:\t' + current
+                counter[i] = cnt + ':' + current
             }
             current = saveTextChar[i]
             cnt = 1
@@ -31,10 +33,10 @@ async function main() {
         return parseInt(a.split(":")[0]) - parseInt(b.split(":")[0]) // Sort by number of duplicates
     })
 
-    let co = 0
-    sortCounter.reverse().forEach( (x) => {
-        console.log(co + '\t-\t' + x)
-        co++
+    sortCounter.reverse().forEach( x => {
+        if (words.check(x.split(":")[1])){ // Word checker in the dictionary
+            console.log(`${x.split(":")[0]}\t:\t${x.split(":")[1]}`)
+        }
     })
 }
 
