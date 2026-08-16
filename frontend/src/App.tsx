@@ -324,7 +324,6 @@ function App() {
           </div>
         ) : (
           <div className="placeholder-screen">
-            <div className="placeholder-icon">✦</div>
             <h2>{t.placeholderTitle}</h2>
             <p>{t.placeholderSub}</p>
           </div>
