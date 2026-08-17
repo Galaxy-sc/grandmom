@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { SelectAndProcessPDF } from '../bindings/changeme/vocabservice';
 import './App.css';
 
@@ -31,7 +31,10 @@ const translations = {
     prev: "Previous",
     next: "Next",
     page: "Page",
-    of: "of"
+    of: "of",
+    searchPlaceholder: "Search words...",
+    noResults: "No words match your search.",
+    resultsFound: "results"
   },
   fa: {
     title: "ووکب‌کور",
@@ -51,7 +54,10 @@ const translations = {
     prev: "قبلی",
     next: "بعدی",
     page: "صفحه",
-    of: "از"
+    of: "از",
+    searchPlaceholder: "جستجوی کلمات...",
+    noResults: "کلمه‌ای مطابق جستجوی شما یافت نشد.",
+    resultsFound: "نتیجه"
   }
 };
 
@@ -64,6 +70,7 @@ function App() {
   
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [pageInput, setPageInput] = useState<string>('1');
+  const [searchQuery, setSearchQuery] = useState<string>('');
   const itemsPerPage = 100;
 
   const t = translations[lang];
@@ -82,7 +89,13 @@ function App() {
   useEffect(() => {
     setCurrentPage(1);
     setPageInput('1');
+    setSearchQuery('');
   }, [currentBook]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+    setPageInput('1');
+  }, [searchQuery]);
 
   useEffect(() => {
     setPageInput(currentPage.toString());
@@ -156,7 +169,17 @@ function App() {
 
   const activeData = currentBook ? library[currentBook] : null;
   const isRtl = lang === 'fa';
-  const totalPages = activeData ? Math.ceil(activeData.words.length / itemsPerPage) : 0;
+
+  const filteredWords = useMemo(() => {
+    if (!activeData) return [];
+    const withIndex = activeData.words.map((w, originalIndex) => ({ ...w, originalIndex }));
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) return withIndex;
+    return withIndex.filter(w => w.word.toLowerCase().includes(q));
+  }, [activeData, searchQuery]);
+
+  const isSearching = searchQuery.trim().length > 0;
+  const totalPages = filteredWords.length > 0 ? Math.ceil(filteredWords.length / itemsPerPage) : 0;
   
   const handlePageJump = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
@@ -176,9 +199,7 @@ function App() {
     setPageInput(p.toString());
   };
 
-  const currentWords = activeData 
-    ? activeData.words.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage) 
-    : [];
+  const currentWords = filteredWords.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   return (
     <div className={`dashboard ${isRtl ? 'rtl-mode' : ''}`} dir={isRtl ? 'rtl' : 'ltr'}>
@@ -233,8 +254,31 @@ function App() {
               <div className="title-area">
                 <h1 className="current-title" title={currentBook}>{currentBook}</h1>
                 <p className="stats-text">
-                  {t.totalWords} {activeData.words.length.toLocaleString()}
+                  {isSearching
+                    ? `${filteredWords.length.toLocaleString()} ${t.resultsFound}`
+                    : `${t.totalWords} ${activeData.words.length.toLocaleString()}`}
                 </p>
+              </div>
+
+              <div className="search-bar">
+                <span className="search-icon">🔍</span>
+                <input
+                  type="text"
+                  className="search-input"
+                  placeholder={t.searchPlaceholder}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  dir="ltr"
+                />
+                {isSearching && (
+                  <button
+                    className="clear-search-btn"
+                    onClick={() => setSearchQuery('')}
+                    title="Clear"
+                  >
+                    ✕
+                  </button>
+                )}
               </div>
               
               <div className="mode-toggle">
@@ -260,8 +304,15 @@ function App() {
                   </tr>
                 </thead>
                 <tbody>
-                  {currentWords.map((item, localIndex) => {
-                    const actualIndex = (currentPage - 1) * itemsPerPage + localIndex;
+                  {currentWords.length === 0 && isSearching && (
+                    <tr>
+                      <td colSpan={4} className="no-results-cell">
+                        {t.noResults}
+                      </td>
+                    </tr>
+                  )}
+                  {currentWords.map((item) => {
+                    const actualIndex = item.originalIndex;
                     const isLearned = !!activeData.learned[actualIndex];
                     
                     return (
@@ -288,38 +339,40 @@ function App() {
               </table>
             </div>
 
-            <div className="pagination-container">
-              <button 
-                className="page-btn" 
-                disabled={currentPage === 1}
-                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-              >
-                ◀ {t.prev}
-              </button>
-              
-              <span className="pagination-info">
-                {t.page} 
-                <input 
-                  type="number" 
-                  className="page-input"
-                  value={pageInput}
-                  onChange={(e) => setPageInput(e.target.value)}
-                  onKeyDown={handlePageJump}
-                  onBlur={handlePageInputBlur}
-                  min={1}
-                  max={totalPages}
-                /> 
-                {t.of} {totalPages}
-              </span>
-              
-              <button 
-                className="page-btn" 
-                disabled={currentPage === totalPages}
-                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-              >
-                {t.next} ▶
-              </button>
-            </div>
+            {totalPages > 0 && (
+              <div className="pagination-container">
+                <button 
+                  className="page-btn" 
+                  disabled={currentPage === 1}
+                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                >
+                  ◀ {t.prev}
+                </button>
+                
+                <span className="pagination-info">
+                  {t.page} 
+                  <input 
+                    type="number" 
+                    className="page-input"
+                    value={pageInput}
+                    onChange={(e) => setPageInput(e.target.value)}
+                    onKeyDown={handlePageJump}
+                    onBlur={handlePageInputBlur}
+                    min={1}
+                    max={totalPages}
+                  /> 
+                  {t.of} {totalPages}
+                </span>
+                
+                <button 
+                  className="page-btn" 
+                  disabled={currentPage === totalPages}
+                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                >
+                  {t.next} ▶
+                </button>
+              </div>
+            )}
 
           </div>
         ) : (

@@ -314,6 +314,69 @@ body {
   box-shadow: 0 2px 8px rgba(0,0,0,0.2);
 }
 
+/* ================== SEARCH ================== */
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0 14px;
+  flex: 1 1 220px;
+  max-width: 320px;
+  height: 44px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.search-bar:focus-within {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+.search-icon {
+  font-size: 0.95rem;
+  opacity: 0.6;
+  flex-shrink: 0;
+}
+
+.search-input {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text-main);
+  font-size: 0.95rem;
+  font-family: inherit;
+}
+
+.search-input::placeholder {
+  color: var(--text-muted);
+}
+
+.clear-search-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+  padding: 4px;
+  transition: color 0.2s;
+}
+
+.clear-search-btn:hover {
+  color: var(--danger);
+}
+
+.no-results-cell {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
 /* ================== TABLE ================== */
 .table-container {
   flex: 1;
@@ -559,4 +622,9 @@ body {
   
   .mode-toggle { width: 100%; }
   .toggle-btn { flex: 1; }
+
+  .search-bar {
+    max-width: none;
+    width: 100%;
+  }
 }
